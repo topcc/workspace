@@ -1,5 +1,6 @@
 package biod.rabbitmq.consumer.mailconsumer.service;
 
+import biod.rabbitmq.consumer.mailconsumer.common.util.ConfirmUtil;
 import biod.rabbitmq.consumer.mailconsumer.entity.MailInfo;
 import biod.rabbitmq.consumer.mailconsumer.mapper.MailMapper;
 import com.rabbitmq.client.Channel;
@@ -12,6 +13,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -39,7 +42,8 @@ public class RabbitReceiver {
         String title = headers.get("title").toString();
         String body = headers.get("body").toString();
         String mailUid = headers.get("mailUid").toString();
-        String returnUrl = headers.get("returnUrl").toString();
+        String returnUrl = null;
+        if (headers.get("returnUrl") != null) returnUrl = headers.get("returnUrl").toString();
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
@@ -62,7 +66,11 @@ public class RabbitReceiver {
         }
 
         if (returnUrl != null){
+            MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+            map.add("mail_uid", mailUid);
 
+            ConfirmUtil confirmUtil = new ConfirmUtil(returnUrl, map);
+            confirmUtil.confirmRequest();
         }
     }
 }

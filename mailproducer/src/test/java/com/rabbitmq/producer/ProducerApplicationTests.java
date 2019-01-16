@@ -36,15 +36,5 @@ public class ProducerApplicationTests {
         properties.put("send_time", simpleDateFormat.format(new Date()));
         rabbitSender.send("Mail", properties);
     }
-
-    @Test
-    public void testDate() throws Exception{
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-        String datestr = simpleDateFormat.format(new Date());
-        Date sendTime = simpleDateFormat.parse(datestr);
-
-        System.out.println(datestr);
-        System.out.println(sendTime);
-    }
 }
 
