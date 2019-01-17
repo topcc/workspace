@@ -44,6 +44,8 @@ public class RabbitReceiver {
         String mailUid = headers.get("mailUid").toString();
         String returnUrl = null;
         if (headers.get("returnUrl") != null) returnUrl = headers.get("returnUrl").toString();
+        Long deliveryTag = (Long) message.getHeaders().get(AmqpHeaders.DELIVERY_TAG);
+        channel.basicAck(deliveryTag, false);
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
@@ -52,12 +54,7 @@ public class RabbitReceiver {
         simpleMailMessage.setText(body);
         mailSender.send(simpleMailMessage);
 
-
         Timestamp sendTime = new Timestamp(new Date().getTime());
-
-        Long deliveryTag = (Long) message.getHeaders().get(AmqpHeaders.DELIVERY_TAG);
-        channel.basicAck(deliveryTag, false);
-
         MailInfo mailInfo = mailMapper.getMailInfo(mailUid);
         if (mailInfo != null) {
             mailInfo.setSendTime(sendTime);
