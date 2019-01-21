@@ -1,6 +1,4 @@
-package com.rabbitmq.producer.entity;
-
-import java.util.Date;
+package com.rabbitmq.consumer.entity;
 
 public class MailInfo {
     private long id;
@@ -13,14 +11,6 @@ public class MailInfo {
     private java.sql.Timestamp sendTime;
     private long mailStatus;
 
-    public MailInfo(String mailUid, String address, String title, String body, String returnUrl){
-        this.mailUid = mailUid;
-        this.mailAddress = address;
-        this.mailTitle = title;
-        this.mailBody = body;
-        this.returnUrl = returnUrl;
-        this.mailStatus = 0;
-    }
 
     public long getId() {
         return id;

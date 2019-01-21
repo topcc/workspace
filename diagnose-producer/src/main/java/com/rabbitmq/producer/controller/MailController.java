@@ -2,7 +2,7 @@ package com.rabbitmq.producer.controller;
 
 import com.rabbitmq.producer.common.exception.MyException;
 import com.rabbitmq.producer.common.util.Util;
-import com.rabbitmq.producer.entity.MailInfo;
+import com.rabbitmq.producer.entity.DiagnoseInfo;
 import com.rabbitmq.producer.mapper.MailMapper;
 import com.rabbitmq.producer.service.RabbitSender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,50 +15,37 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/biod")
+@RequestMapping("/biod/ecgdiagnose")
 public class MailController {
     @Autowired
     private RabbitSender rabbitSender;
 
     @Autowired
     private MailMapper mailMapper;
-
-    @RequestMapping("/mail")
-    public Map<String, String> sendMail(@RequestParam(name = "address") String address,
-                                        @RequestParam(name = "title") String title,
-                                        @RequestParam(name = "body") String body,
+    //String diagnoseUid, String fileUid, String filePath, String userMail, String returnUrl
+    @RequestMapping("/class2")
+    public Map<String, String> sendMail(@RequestParam(name = "diagnoseUid") String diagnoseUid,
+                                        @RequestParam(name = "fileUid") String fileUid,
+                                        @RequestParam(name = "filePath") String filePath,
+                                        @RequestParam(name = "userMail") String userMail,
                                         @RequestParam(name = "returnUrl", required = false) String returnUrl) throws Exception {
 
-        if (!Util.emailFormat(address)) throw new MyException("1", "Error in mail address format");
-
-        String mailUid = UUID.randomUUID().toString();
+        if (!Util.emailFormat(userMail)) throw new MyException("500", "Error in mail address format");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("mailUid", mailUid);
-        properties.put("address", address);
-        properties.put("title", title);
-        properties.put("body", body);
+        properties.put("diagnoseUid", diagnoseUid);
+        properties.put("fileUid", fileUid);
+        properties.put("filePath", filePath);
+        properties.put("userMail", userMail);
         properties.put("returnUrl", returnUrl);
         rabbitSender.send("Mail", properties);
 
-        MailInfo mailInfo = new MailInfo(mailUid, address, title, body, returnUrl);
-        mailMapper.insert(mailInfo);
+        DiagnoseInfo diagnoseInfo = new DiagnoseInfo(diagnoseUid, fileUid, filePath, userMail, returnUrl);
+        mailMapper.insert(diagnoseInfo);
 
         Map<String, String> res = new HashMap<>();
         res.put("code", "200");
-        res.put("msg", "Send successfully");
-        res.put("mailUid", mailUid);
+        res.put("msg", "successfully");
         return res;
-    }
-
-    @RequestMapping("/index")
-    public Object index(@RequestParam(name = "id") int id){
-        MailInfo mailInfo = mailMapper.getMailInfo(id);
-        if (mailInfo == null){
-            return "这不是一个有效数据";
-        }
-        else {
-            return mailInfo;
-        }
     }
 }
