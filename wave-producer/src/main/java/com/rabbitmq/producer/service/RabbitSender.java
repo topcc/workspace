@@ -41,6 +41,6 @@ public class RabbitSender {
         rabbitTemplate.setConfirmCallback(confirmCallback);
         rabbitTemplate.setReturnCallback(returnCallback);
         CorrelationData correlationData = new CorrelationData("rabbit-" + UUID.randomUUID());
-        rabbitTemplate.convertAndSend("exchange-mail", "springboot.mail", msg, correlationData);
+        rabbitTemplate.convertAndSend("exchange-wave", "springboot.wave", msg, correlationData);
     }
 }
