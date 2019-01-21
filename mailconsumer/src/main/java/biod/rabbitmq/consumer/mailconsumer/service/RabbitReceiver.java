@@ -32,7 +32,8 @@ public class RabbitReceiver {
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "queue-mail", durable = "true"),
-            exchange = @Exchange(value = "exchange-mail", durable = "true", type = "topic", ignoreDeclarationExceptions = "true"),
+            exchange = @Exchange(value = "exchange-mail", durable = "true",
+                    type = "topic", ignoreDeclarationExceptions = "true"),
             key = "springboot.*"
     ))
     @RabbitHandler
