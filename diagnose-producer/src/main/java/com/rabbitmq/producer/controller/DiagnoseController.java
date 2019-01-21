@@ -3,7 +3,7 @@ package com.rabbitmq.producer.controller;
 import com.rabbitmq.producer.common.exception.MyException;
 import com.rabbitmq.producer.common.util.Util;
 import com.rabbitmq.producer.entity.DiagnoseInfo;
-import com.rabbitmq.producer.mapper.MailMapper;
+import com.rabbitmq.producer.mapper.DiagnoseMapper;
 import com.rabbitmq.producer.service.RabbitSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,13 +16,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/biod/ecgdiagnose")
-public class MailController {
+public class DiagnoseController {
     @Autowired
     private RabbitSender rabbitSender;
 
     @Autowired
-    private MailMapper mailMapper;
-    //String diagnoseUid, String fileUid, String filePath, String userMail, String returnUrl
+    private DiagnoseMapper diagnoseMapper;
+
     @RequestMapping("/class2")
     public Map<String, String> sendMail(@RequestParam(name = "diagnoseUid") String diagnoseUid,
                                         @RequestParam(name = "fileUid") String fileUid,
@@ -32,20 +32,32 @@ public class MailController {
 
         if (!Util.emailFormat(userMail)) throw new MyException("500", "Error in mail address format");
 
+        String taskUid = UUID.randomUUID().toString();
+        String model = "python /notebooks/ecg-diagnose.py ";
+
         Map<String, Object> properties = new HashMap<>();
+        properties.put("taskUid", taskUid);
         properties.put("diagnoseUid", diagnoseUid);
         properties.put("fileUid", fileUid);
         properties.put("filePath", filePath);
         properties.put("userMail", userMail);
         properties.put("returnUrl", returnUrl);
+        properties.put("model", model);
         rabbitSender.send("Mail", properties);
 
-        DiagnoseInfo diagnoseInfo = new DiagnoseInfo(diagnoseUid, fileUid, filePath, userMail, returnUrl);
-        mailMapper.insert(diagnoseInfo);
+        DiagnoseInfo diagnoseInfo = new DiagnoseInfo();
+        diagnoseInfo.setTaskUid(taskUid);
+        diagnoseInfo.setDiagnoseUid(diagnoseUid);
+        diagnoseInfo.setFileUid(fileUid);
+        diagnoseInfo.setFilePath(filePath);
+        diagnoseInfo.setUserMail(userMail);
+        diagnoseInfo.setReturnUrl(returnUrl);
+        diagnoseMapper.insert(diagnoseInfo);
 
         Map<String, String> res = new HashMap<>();
         res.put("code", "200");
         res.put("msg", "successfully");
+        res.put("taskUid", taskUid);
         return res;
     }
 }

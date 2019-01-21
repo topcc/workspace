@@ -1,4 +1,6 @@
-package com.rabbitmq.producer.entity;
+package com.rabbitmq.consumer.entity;
+
+import java.sql.Timestamp;
 
 public class DiagnoseInfo {
     private long id;
@@ -12,7 +14,6 @@ public class DiagnoseInfo {
     private java.sql.Timestamp createTime;
     private java.sql.Timestamp finishTime;
     private long taskStatus;
-
 
     public long getId() {
         return id;

@@ -1,5 +1,7 @@
 package com.rabbitmq.producer;
 
+import com.rabbitmq.producer.entity.DiagnoseInfo;
+import com.rabbitmq.producer.mapper.DiagnoseMapper;
 import com.rabbitmq.producer.service.RabbitSender;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,26 +27,8 @@ public class ProducerApplicationTests {
     @Autowired
     private RabbitSender rabbitSender;
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    @Autowired
+    private DiagnoseMapper diagnoseMapper;
 
-    @Ignore
-    public void testMail() throws Exception{
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("address", "799792309@qq.com");
-        properties.put("title", "这是标题");
-        properties.put("body", "这是正文");
-        properties.put("send_time", simpleDateFormat.format(new Date()));
-        rabbitSender.send("Mail", properties);
-    }
-
-    @Test
-    public void testDate() throws Exception{
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-        String datestr = simpleDateFormat.format(new Date());
-        Date sendTime = simpleDateFormat.parse(datestr);
-
-        System.out.println(datestr);
-        System.out.println(sendTime);
-    }
 }
 

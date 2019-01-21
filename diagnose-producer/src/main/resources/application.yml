@@ -11,7 +11,7 @@ spring:
       mandatory: true
 
   datasource:
-    url: jdbc:mysql://www.biodwhu.cn/biod_server_mail
+    url: jdbc:mysql://www.biodwhu.cn/biod_server_diagnose
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
