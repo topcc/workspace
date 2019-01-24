@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/biod/ecgdiagnose")
+@RequestMapping("/ecg/dp")
 public class DiagnoseController {
     @Autowired
     private RabbitSender rabbitSender;
@@ -23,14 +23,11 @@ public class DiagnoseController {
     @Autowired
     private DiagnoseMapper diagnoseMapper;
 
-    @RequestMapping("/class2")
+    @RequestMapping("/class2/v1")
     public Map<String, String> sendMail(@RequestParam(name = "diagnoseUid") String diagnoseUid,
                                         @RequestParam(name = "fileUid") String fileUid,
                                         @RequestParam(name = "filePath") String filePath,
-                                        @RequestParam(name = "userMail") String userMail,
                                         @RequestParam(name = "returnUrl", required = false) String returnUrl) throws Exception {
-
-        if (!Util.emailFormat(userMail)) throw new MyException("500", "Error in mail address format");
 
         String taskUid = UUID.randomUUID().toString();
         String model = "python /notebooks/ecg-diagnose.py ";
@@ -40,7 +37,6 @@ public class DiagnoseController {
         properties.put("diagnoseUid", diagnoseUid);
         properties.put("fileUid", fileUid);
         properties.put("filePath", filePath);
-        properties.put("userMail", userMail);
         properties.put("returnUrl", returnUrl);
         properties.put("model", model);
         rabbitSender.send("Mail", properties);
@@ -50,7 +46,6 @@ public class DiagnoseController {
         diagnoseInfo.setDiagnoseUid(diagnoseUid);
         diagnoseInfo.setFileUid(fileUid);
         diagnoseInfo.setFilePath(filePath);
-        diagnoseInfo.setUserMail(userMail);
         diagnoseInfo.setReturnUrl(returnUrl);
         diagnoseMapper.insert(diagnoseInfo);
 

@@ -40,21 +40,20 @@ public class FileHelper {
     }
 
     public String readToString(String fileName) {
+        // 读取结果
         String encoding = "UTF-8";
         File file = new File(fileName);
-        Long filelength = file.length();
-        byte[] filecontent = new byte[filelength.intValue()];
+        Long fileLength = file.length();
+        byte[] fileContent = new byte[fileLength.intValue()];
         try {
-            FileInputStream in = new FileInputStream(file);
-            in.read(filecontent);
-            in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(fileContent);
+            fileInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            return new String(filecontent, encoding);
+            return new String(fileContent, encoding);
         } catch (UnsupportedEncodingException e) {
             System.err.println("The OS does not support " + encoding);
             e.printStackTrace();

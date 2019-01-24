@@ -1,18 +1,17 @@
-package biod.rabbitmq.consumer.mailconsumer.common.util;
+package com.rabbitmq.consumer.common.util;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class ConfirmUtil {
+public class RebackUtil {
     private String url = null;
     private MultiValueMap<String, String> value = null;
 
-    public ConfirmUtil(String url, MultiValueMap<String, String> value){
+    public RebackUtil(String url, MultiValueMap<String, String> value){
         this.url = url;
         this.value = value;
     }

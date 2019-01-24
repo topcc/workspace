@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,6 +33,14 @@ public class ConsumerApplicationTests {
 
     @Test
     public void contextLoads() {
+        Timestamp finishTime = new Timestamp(new Date().getTime());
+        DiagnoseInfo diagnoseInfo = diagnoseMapper.getDiagnoseInfo("2d8c41c9-a2d9-456b-8412-53d6d428396d");
+        if (diagnoseInfo != null) {
+            diagnoseInfo.setResult("[{\"prob\": 0.006, \"label\": \"01000000\"}, {\"prob\": 0.994, \"label\": \"02000000\"}]");
+            diagnoseInfo.setFinishTime(finishTime);
+            diagnoseInfo.setTaskStatus(1);
+            diagnoseMapper.update(diagnoseInfo);
+        }
     }
 
     @Ignore

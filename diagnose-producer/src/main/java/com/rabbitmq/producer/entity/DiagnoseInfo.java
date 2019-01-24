@@ -6,7 +6,6 @@ public class DiagnoseInfo {
     private String diagnoseUid;
     private String fileUid;
     private String filePath;
-    private String userMail;
     private String returnUrl;
     private String result;
     private java.sql.Timestamp createTime;
@@ -54,15 +53,6 @@ public class DiagnoseInfo {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
-    }
-
-
-    public String getUserMail() {
-        return userMail;
-    }
-
-    public void setUserMail(String userMail) {
-        this.userMail = userMail;
     }
 
 

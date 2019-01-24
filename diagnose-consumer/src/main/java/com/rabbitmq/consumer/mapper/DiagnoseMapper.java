@@ -10,6 +10,6 @@ public interface DiagnoseMapper {
     @Select("SELECT * FROM biod_diagnose WHERE task_uid = #{taskUid}")
     DiagnoseInfo getDiagnoseInfo(String taskUid);
 
-    @Update("UPDATE biod_diagnose SET result = #{result} finish_time = #{finishTime}, task_status = #{taskStatus} WHERE id =#{id}")
+    @Update("UPDATE biod_diagnose SET result = #{result}, finish_time = #{finishTime}, task_status = #{taskStatus} WHERE id =#{id}")
     void update(DiagnoseInfo diagnoseInfo);
 }
