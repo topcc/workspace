@@ -29,10 +29,13 @@ public class MailController {
                                         @RequestParam(name = "body") String body,
                                         @RequestParam(name = "returnUrl", required = false) String returnUrl) throws Exception {
 
-        if (!Util.emailFormat(address)) throw new MyException("1", "Error in mail address format");
+        // 验证邮箱格式
+        if (!Util.emailFormat(address)) throw new MyException("500", "Error in mail address format");
 
+        // 生成唯一Uid
         String mailUid = UUID.randomUUID().toString();
 
+        // 丢入队列的参数Map
         Map<String, Object> properties = new HashMap<>();
         properties.put("mailUid", mailUid);
         properties.put("address", address);
@@ -41,9 +44,11 @@ public class MailController {
         properties.put("returnUrl", returnUrl);
         rabbitSender.send("Mail", properties);
 
+        // 记录邮件信息
         MailInfo mailInfo = new MailInfo(mailUid, address, title, body, returnUrl);
         mailMapper.insert(mailInfo);
 
+        // 返回信息
         Map<String, String> res = new HashMap<>();
         res.put("code", "200");
         res.put("msg", "Send successfully");
@@ -51,6 +56,7 @@ public class MailController {
         return res;
     }
 
+    // 连接测试
     @RequestMapping("/index")
     public Object index(@RequestParam(name = "id") int id){
         MailInfo mailInfo = mailMapper.getMailInfo(id);

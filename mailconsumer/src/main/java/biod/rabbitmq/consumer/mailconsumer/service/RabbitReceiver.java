@@ -1,6 +1,6 @@
 package biod.rabbitmq.consumer.mailconsumer.service;
 
-import biod.rabbitmq.consumer.mailconsumer.common.util.ConfirmUtil;
+import biod.rabbitmq.consumer.mailconsumer.common.util.RebackUtil;
 import biod.rabbitmq.consumer.mailconsumer.entity.MailInfo;
 import biod.rabbitmq.consumer.mailconsumer.mapper.MailMapper;
 import com.rabbitmq.client.Channel;
@@ -27,10 +27,11 @@ public class RabbitReceiver {
     @Autowired
     private MailMapper mailMapper;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username}") // 默认邮箱
     private String sender;
 
     @RabbitListener(bindings = @QueueBinding(
+            // 设置Exchange Queue Key
             value = @Queue(value = "queue-mail", durable = "true"),
             exchange = @Exchange(value = "exchange-mail", durable = "true",
                     type = "topic", ignoreDeclarationExceptions = "true"),
@@ -38,6 +39,7 @@ public class RabbitReceiver {
     ))
     @RabbitHandler
     public void onMail(Message message, Channel channel) throws Exception{
+        // 获取传递的参数
         MessageHeaders headers = message.getHeaders();
         String address = headers.get("address").toString();
         String title = headers.get("title").toString();
@@ -45,9 +47,12 @@ public class RabbitReceiver {
         String mailUid = headers.get("mailUid").toString();
         String returnUrl = null;
         if (headers.get("returnUrl") != null) returnUrl = headers.get("returnUrl").toString();
+
+        // 确认收到消息 并回调
         Long deliveryTag = (Long) message.getHeaders().get(AmqpHeaders.DELIVERY_TAG);
         channel.basicAck(deliveryTag, false);
 
+        // 邮件配置
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
         simpleMailMessage.setTo(address);
@@ -55,6 +60,7 @@ public class RabbitReceiver {
         simpleMailMessage.setText(body);
         mailSender.send(simpleMailMessage);
 
+        // 更新数据库中的邮件信息
         Timestamp sendTime = new Timestamp(new Date().getTime());
         MailInfo mailInfo = mailMapper.getMailInfo(mailUid);
         if (mailInfo != null) {
@@ -63,12 +69,13 @@ public class RabbitReceiver {
             mailMapper.update(mailInfo);
         }
 
+        // 若传来对方的回调函数 则将信息反馈给对方
         if (returnUrl != null){
             MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
             map.add("mail_uid", mailUid);
 
-            ConfirmUtil confirmUtil = new ConfirmUtil(returnUrl, map);
-            confirmUtil.confirmRequest();
+            RebackUtil rebackUtil = new RebackUtil(returnUrl, map);
+            rebackUtil.confirmRequest();
         }
     }
 }

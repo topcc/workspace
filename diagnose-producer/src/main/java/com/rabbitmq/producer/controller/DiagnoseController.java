@@ -39,7 +39,7 @@ public class DiagnoseController {
         properties.put("filePath", filePath);
         properties.put("returnUrl", returnUrl);
         properties.put("model", model);
-        rabbitSender.send("Mail", properties);
+        rabbitSender.send("Diagnose", properties);
 
         DiagnoseInfo diagnoseInfo = new DiagnoseInfo();
         diagnoseInfo.setTaskUid(taskUid);

@@ -4,15 +4,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class ConfirmUtil {
+public class RebackUtil {
+    // 回调链接
     private String url = null;
+    // 参数 其他类型的Map可能报错
     private MultiValueMap<String, String> value = null;
 
-    public ConfirmUtil(String url, MultiValueMap<String, String> value){
+    public RebackUtil(String url, MultiValueMap<String, String> value){
         this.url = url;
         this.value = value;
     }
@@ -21,10 +22,13 @@ public class ConfirmUtil {
         if (url != null && value != null){
             RestTemplate restTemplate = new RestTemplate();
 
+            // 设置Header信息
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+            // 封装http请求
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(value, headers);
+            // 发送请求
             ResponseEntity<String> response = restTemplate.postForEntity( url, request , String.class );
         }
     }
