@@ -42,7 +42,7 @@ public class RabbitReceiver {
         String fileUid = headers.get("fileUid").toString();
         String filePath = headers.get("filePath").toString();
         String returnUrl = headers.get("returnUrl").toString();
-        String model = headers.get("model").toString();
+        String modelPath = headers.get("modelPath").toString();
 
         // 手动处理接受信息
         Long deliveryTag = (Long) message.getHeaders().get(AmqpHeaders.DELIVERY_TAG);
@@ -53,14 +53,20 @@ public class RabbitReceiver {
         FileHelper fileHelper = new FileHelper(fileUid, filePath, localPath);
         String file = fileHelper.fileDownload();
 
-        // 调用模型进行诊断
         long startTime = new Date().getTime();
 
-        String cmd = model + file + localPath + "result";
-        System.out.println(cmd);
-        CmdHelper cmdHelper = new CmdHelper();
-        String resultStr = cmdHelper.runCommand(cmd);
-        System.out.println(resultStr);
+        // 拼接命令
+        String cmd = modelPath + file + localPath + "result";
+        try {
+            // 调用命名
+            CmdHelper cmdHelper = new CmdHelper();
+            String resultStr = cmdHelper.runCommand(cmd);
+            // 输出结果
+            System.out.println(resultStr);
+        }
+        catch (Exception exc){
+            System.out.println(cmd);
+        }
 
         long endTime = new Date().getTime();
         long useTime = endTime - startTime;

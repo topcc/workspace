@@ -36,11 +36,15 @@ public class RabbitSender {
     };
 
     public void send(Object message, Map<String, Object> properties) throws Exception{
+        // 将参数Map封装进Message
         MessageHeaders messageHeaders = new MessageHeaders(properties);
         Message msg = MessageBuilder.createMessage(message, messageHeaders);
+        // 添加Callback内容
         rabbitTemplate.setConfirmCallback(confirmCallback);
         rabbitTemplate.setReturnCallback(returnCallback);
+        // 添加相关参数 这里仅添加Uid便于查看
         CorrelationData correlationData = new CorrelationData("rabbit-" + UUID.randomUUID());
+        // 发送至消息队列
         rabbitTemplate.convertAndSend("exchange-diagnose", "springboot.diagnose", msg, correlationData);
     }
 }
